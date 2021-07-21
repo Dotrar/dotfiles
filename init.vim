@@ -10,7 +10,6 @@ let mapleader = ","
 
 " Colours
 set termguicolors
-let ayucolor="dark"
 
 " neovim-plug Plugins -----------------
 " using the `plugged` plugin manager
@@ -20,20 +19,26 @@ call plug#begin(stdpath('data') . '/plugged')
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
     Plug 'junegunn/fzf.vim'
     Plug 'tpope/vim-fugitive'
-    Plug 'tpope/vim-rhubarb'
-    Plug 'ervandew/supertab'
-    " SuperTab, Tab through the list top-to-bot
-    let g:SuperTabDefaultCompletionType = "<c-n>"
-    " Plug 'easymotion/vim-easymotion'
-    Plug 'Yilin-Yang/vim-markbar'
+    Plug 'tpope/vim-rhubarb' "allows 'open in github'
+    Plug 'ervandew/supertab' "allows a lot of tab completions
+    let g:SuperTabDefaultCompletionType = "<c-n>" "change completions to be top to bot.
 
+    Plug 'tpope/vim-commentary' "allow toggle comment line
 
-    " colorschemes (I can never decide)
-    " Plug 'itchyny/lightline.vim'
+    Plug 'kshenoy/vim-signature' "show marks in the number column, very handy as reminder
+    Plug 'folke/zen-mode.nvim'   "Silence distraction to work on just the one buffer
+
+    Plug 'tpope/vim-markdown'
+    Plug 'tbastos/vim-lua'
     Plug 'fatih/molokai'
-    Plug 'ayu-theme/ayu-vim'
 
+    " These are related to telescope that I haven't set up yet.
+    Plug 'nvim-lua/popup.nvim'
+    Plug 'nvim-lua/plenary.nvim'
+    Plug 'nvim-telescope/telescope.nvim'
 
+    " yet to do one day, as I'll have to set it up
+    "    Plug 'neovim/nvim-lspconfig'
     " generate tags and things for python
     Plug 'xolox/vim-easytags'
     Plug 'xolox/vim-misc'
@@ -44,9 +49,8 @@ call plug#begin(stdpath('data') . '/plugged')
     "Once installed, run :CocInstall coc-jedi
     " to have a python language server
 
-    " Better python syntax highlighting, not entirely convinced
+    " Better python syntax highlighting
     Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
-    Plug 'tpope/vim-commentary'
     Plug 'preservim/tagbar'
 
 
@@ -69,23 +73,19 @@ let g:netrw_liststyle=3     " Tree mode view
 let g:netrw_browse_split=0  " Open file in previous buffer
 let g:netrw_winsize=10      " Make netrw window smaller
 
-
-nmap <Leader>m <Plug>ToggleMarkbar
-let g:markbar_marks_to_display = 'abcdefghiABCDEFGHI'
-let g:markbar_width = 30
-let g:markbar_next_mark_mapping     = '/'
-let g:markbar_previous_mark_mapping = '?'
-let g:markbar_rename_mark_mapping   = '<F2>'
-let g:markbar_reset_mark_mapping    = 'r'
-let g:markbar_delete_mark_mapping   = '<Del>'
+let g:markdown_fenced_languages = ['html', 'python', 'bash=sh']
+let g:markdown_syntax_conceal = 0
+let g:markdown_minlines = 100
 
 
-let g:fzf_preview_window = ['up:60%', 'ctrl-/']
+
+let g:fzf_preview_window = ['right:60%', 'ctrl-/']
 
 colorscheme molokai
 if has("nvim-0.5.0")
     set signcolumn=number
 endif
+
 " for pdf generation
 autocmd! BufRead,BufNewFile *.rml set filetype=xml 
 
@@ -93,8 +93,8 @@ autocmd! BufRead,BufNewFile *.rml set filetype=xml
 " Keybindings 
 " =========================
 
-" F1 shows current diff (fugitive)
-nmap <F1> :Git<Cr>
+" gq shows current diff (fugitive) - acts like a toggle, as gq closes it again
+nnoremap gq :Git<Cr>
 " F2 shows open buffers (fzf), Ctrl-F2 delete buffers (tab select)
 nmap <F2> :Buffers<CR>
 nmap <C-F2> :BufferDelete<CR>
@@ -105,7 +105,7 @@ nmap <F4> :Ag<CR>
 
 " Commands based on navigating code at a macro level
 " F5 - find where "the function I'm in" is used. go up call stack
-nmap <F5> ?\C\<def\>=
+nmap <F5> ?\C\<def\><CR>w:Ag (?<!def )(?<!_)<C-r><C-w><CR>
 " F6 - find where else this is mentioned
 nmap <F6> :Ag <C-r><C-w><CR>
 
@@ -132,9 +132,8 @@ nmap <leader>v :vsp<CR><Plug>(coc-definition)<C-w>j
 nmap <leader>] <Plug>(coc-diagnostic-next)
 nmap <leader>\ :<C-u>CocList diagnostics<cr>
 
-
-nmap c= $?=<CR>lC
-
+" change from = sign onwards.
+nmap c= $T=C
 " ============== Find similar files (by name or by test)
 
 " F9 - Find similarly named files
@@ -158,7 +157,6 @@ function! s:related_test()
 
     return join(split(expand('%:h'),'/')[3:],' ') . ' ' . l:searchfile
 endfunction
-
 
 
 " ============== This is all related to being able to dlete buffer window from
