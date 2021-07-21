@@ -90,6 +90,9 @@ endif
 autocmd! BufRead,BufNewFile *.rml set filetype=xml 
 
 
+nnoremap \ :<C-u>marks<CR>:normal! `
+
+
 " Keybindings 
 " =========================
 
